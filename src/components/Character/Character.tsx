@@ -25,6 +25,9 @@ const Character = ({
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
   audioEnabled = false,
+  useNvidiaApi = false,
+  apiKey,
+  nvidiaModel = 'MARK',
 }: CharacterProps) => {
   // Load the GLTF model
   const { scene } = useGLTF(modelPath) as GLTFResult;
@@ -88,7 +91,10 @@ const Character = ({
       {audioEnabled && model && (
         <AudioFaceController 
           character={model} 
-          isActive={audioEnabled} 
+          isActive={audioEnabled}
+          useNvidiaApi={useNvidiaApi}
+          apiKey={apiKey}
+          model={nvidiaModel}
         />
       )}
     </group>

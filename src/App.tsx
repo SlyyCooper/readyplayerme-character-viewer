@@ -18,9 +18,19 @@ function App() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 1, 3]);
   
+  // NVIDIA Audio2Face API settings
+  const [useNvidiaApi, setUseNvidiaApi] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [nvidiaModel, setNvidiaModel] = useState<'MARK' | 'CLAIRE' | 'JAMES'>('MARK');
+  
   // Toggle audio for face animation
   const toggleAudio = () => {
     setAudioEnabled(!audioEnabled);
+  };
+  
+  // Toggle between browser audio and NVIDIA API
+  const toggleNvidiaApi = () => {
+    setUseNvidiaApi(!useNvidiaApi);
   };
   
   // Reset character view
@@ -67,6 +77,9 @@ function App() {
               modelPath={MODEL_PATH}
               position={[0, -1, 0]}
               audioEnabled={audioEnabled}
+              useNvidiaApi={useNvidiaApi}
+              apiKey={apiKey}
+              nvidiaModel={nvidiaModel}
             />
           </Suspense>
           
@@ -79,6 +92,12 @@ function App() {
         toggleAudio={toggleAudio}
         isAudioEnabled={audioEnabled}
         resetCharacter={resetCharacter}
+        useNvidiaApi={useNvidiaApi}
+        toggleNvidiaApi={toggleNvidiaApi}
+        apiKey={apiKey}
+        setApiKey={setApiKey}
+        nvidiaModel={nvidiaModel}
+        setNvidiaModel={setNvidiaModel}
       />
     </div>
   );

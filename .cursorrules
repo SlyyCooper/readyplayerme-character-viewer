@@ -30,8 +30,11 @@ Your Requirements:
 │   │   │   ├── ControlPanel.tsx
 │   ├── hooks
 │   │   ├── useAudioAnalysis.ts
+│   │   ├── useNvidiaAudio2Face.ts
 │   ├── index.css
 │   ├── main.tsx
+│   ├── services
+│   │   ├── NVIDIAAudio2FaceService.ts
 │   ├── types
 │   │   ├── index.ts
 │   ├── utils

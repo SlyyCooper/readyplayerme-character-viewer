@@ -4,11 +4,12 @@
  * Used by the Character component
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { AudioFaceProps } from '../../types';
 import useAudioAnalysis from '../../hooks/useAudioAnalysis';
+import useNvidiaAudio2Face from '../../hooks/useNvidiaAudio2Face';
 import { mapAudioToBlendshapes } from './faceMapping';
 
 // Prefix for NVIDIA blendshapes
@@ -19,9 +20,26 @@ interface MorphTargetDictionary {
   [key: string]: number;
 }
 
-const AudioFaceController = ({ character, isActive }: AudioFaceProps) => {
-  const [audioResult, audioInitialized] = useAudioAnalysis(isActive);
+const AudioFaceController = ({ 
+  character, 
+  isActive, 
+  useNvidiaApi = false,
+  apiKey,
+  model = 'MARK'
+}: AudioFaceProps) => {
+  const [localAudioResult, localAudioInitialized] = useAudioAnalysis(!useNvidiaApi && isActive);
+  const [nvidiaAudioResult, nvidiaInitialized, nvidiaBlendshapes] = useNvidiaAudio2Face(
+    useNvidiaApi && isActive,
+    apiKey,
+    model as 'MARK' | 'CLAIRE' | 'JAMES'
+  );
+  
+  // Use the appropriate audio results based on API flag
+  const audioResult = useNvidiaApi ? nvidiaAudioResult : localAudioResult;
+  const audioInitialized = useNvidiaApi ? nvidiaInitialized : localAudioInitialized;
+  
   const meshesWithMorphTargets = useRef<THREE.Mesh[]>([]);
+  const [currentBlendshapeFrame, setCurrentBlendshapeFrame] = useState(0);
   
   // Initialize and find all morph targets in the model
   useEffect(() => {
@@ -55,8 +73,22 @@ const AudioFaceController = ({ character, isActive }: AudioFaceProps) => {
   useFrame(() => {
     if (!isActive || !audioInitialized || meshesWithMorphTargets.current.length === 0) return;
     
-    // Map audio analysis to blendshapes
-    const blendshapes = mapAudioToBlendshapes(audioResult);
+    // Get blendshapes either from NVIDIA API or local analysis
+    let blendshapes;
+    if (useNvidiaApi && nvidiaBlendshapes.length > 0) {
+      // Use pre-computed blendshapes from NVIDIA API
+      blendshapes = nvidiaBlendshapes[currentBlendshapeFrame];
+      
+      // Cycle through frames if we have multiple
+      if (nvidiaBlendshapes.length > 1) {
+        setCurrentBlendshapeFrame((prev) => 
+          (prev + 1) % nvidiaBlendshapes.length
+        );
+      }
+    } else {
+      // Map audio analysis to blendshapes locally
+      blendshapes = mapAudioToBlendshapes(audioResult);
+    }
     
     // Apply blendshapes to all morphable meshes
     meshesWithMorphTargets.current.forEach(mesh => {

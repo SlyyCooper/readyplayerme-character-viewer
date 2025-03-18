@@ -15,6 +15,7 @@
     "@react-three/postprocessing": "^3.0.4",
     "@types/three": "^0.174.0",
     "audio-recorder-polyfill": "^0.4.1",
+    "axios": "^1.6.7",
     "hark": "^1.2.3",
     "lamina": "^1.1.23",
     "react": "^19.0.0",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/axios": "^0.14.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
